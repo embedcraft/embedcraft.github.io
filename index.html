@@ -5,6 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EmbedCraft Systems | AI-Driven Embedded Design &amp; Development</title>
 <meta name="description" content="EmbedCraft Systems — an embedded engineering studio combining hardware, firmware and edge-AI. ESP32, STM32, display and camera expertise, PCB design, RTOS firmware and TinyML.">
+<meta name="keywords" content="embedded systems design, firmware development, ESP32 development, STM32 firmware, PCB design services, TinyML, edge AI, IoT product development, embedded consultancy, MIPI camera integration, LVGL display">
+<meta name="author" content="EmbedCraft Systems">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#2f5bff">
+<link rel="canonical" href="https://embedcraft.github.io/">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232f5bff'/%3E%3Cstop offset='100%25' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='44' font-family='Helvetica,Arial,sans-serif' font-size='28' font-weight='bold' fill='white' text-anchor='middle'%3EEC%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="og-image.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EmbedCraft Systems">
+<meta property="og:url" content="https://embedcraft.github.io/">
+<meta property="og:title" content="EmbedCraft Systems | Embedded engineering, rebuilt around AI">
+<meta property="og:description" content="Hardware, firmware and on-device AI for connected products. ESP32, STM32, display and camera expertise from a studio taking on its first client projects.">
+<meta property="og:image" content="https://embedcraft.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EmbedCraft Systems | Embedded engineering, rebuilt around AI">
+<meta name="twitter:description" content="Hardware, firmware and on-device AI for connected products. ESP32, STM32, display and camera expertise.">
+<meta name="twitter:image" content="https://embedcraft.github.io/og-image.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "EmbedCraft Systems",
+  "description": "Embedded engineering studio providing hardware design, firmware development and on-device AI for connected products.",
+  "url": "https://embedcraft.github.io/",
+  "email": "hello@embedcraftsystems.com",
+  "areaServed": "Worldwide",
+  "knowsAbout": ["Embedded Systems","Firmware Development","PCB Design","ESP32","STM32","TinyML","Edge AI","IoT","MIPI-CSI Camera Integration","LVGL Display Interfaces"],
+  "serviceType": ["Embedded Hardware Design","Firmware Development","Edge AI / TinyML","IoT Product Development"]
+}
+</script>
 <style>
   :root{
     --bg:#ffffff;
@@ -684,13 +719,13 @@ mqtt_publish(&client,
       <div class="item"><div class="k">Response Time</div><div class="v">Within 1 business day</div></div>
     </div>
     <form id="cform" novalidate>
-      <div class="form-ok" id="formOk">Thanks — your message is captured. Connect a form backend (see the publishing guide) so submissions reach your inbox.</div>
+      <div class="form-ok" id="formOk">Thanks! Your email app should have opened with the message ready — just press send. If nothing opened, email us directly at <strong>hello@embedcraftsystems.com</strong>.</div>
       <label>Name</label>
       <input type="text" id="f-name" placeholder="Your name">
       <label>Email</label>
       <input type="email" id="f-email" placeholder="you@company.com">
       <label>Project Type</label>
-      <select>
+      <select id="f-type">
         <option>ESP32 / Wireless Product</option>
         <option>STM32 / MCU Firmware</option>
         <option>Display / HMI Integration</option>
@@ -703,7 +738,7 @@ mqtt_publish(&client,
       <label>Project Details</label>
       <textarea id="f-msg" placeholder="Briefly describe what you're building..."></textarea>
       <button type="submit" class="submit-btn">Send Message</button>
-      <p class="form-note">Demo form — connect it to Formspree or similar to receive real submissions.</p>
+      <p class="form-note">Prefer email? Write to us directly at hello@embedcraftsystems.com</p>
     </form>
   </div>
 </section>
@@ -1013,19 +1048,35 @@ mqtt_publish(&client,
   first.classList.add('open');
   first.querySelector('.faq-a').style.maxHeight=first.querySelector('.faq-a').scrollHeight+'px';
 
-  /* ---------- 12. FORM ---------- */
+  /* ---------- 12. FORM — delivers via the visitor's email client ----------
+     To switch to a hosted form service later (e.g. Formspree), replace the
+     mailto block below with a fetch() POST to your form endpoint.            */
+  var CONTACT_EMAIL = 'hello@embedcraftsystems.com';
   document.getElementById('cform').addEventListener('submit', function(e){
     e.preventDefault();
-    var n=document.getElementById('f-name'), em=document.getElementById('f-email'), m=document.getElementById('f-msg'), ok=true;
+    var n=document.getElementById('f-name'), em=document.getElementById('f-email'),
+        ty=document.getElementById('f-type'), m=document.getElementById('f-msg'), ok=true;
     [n,em,m].forEach(function(f){ f.classList.remove('err'); });
     if(!n.value.trim()){ n.classList.add('err'); ok=false; }
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value)){ em.classList.add('err'); ok=false; }
     if(!m.value.trim()){ m.classList.add('err'); ok=false; }
-    if(!ok) return;
+    if(!ok){
+      (document.querySelector('#cform .err')||n).focus();
+      return;
+    }
+    var subject = 'Project enquiry: ' + ty.value + ' — ' + n.value.trim();
+    var body = 'Name: ' + n.value.trim() +
+               '\nEmail: ' + em.value.trim() +
+               '\nProject type: ' + ty.value +
+               '\n\nProject details:\n' + m.value.trim() +
+               '\n\n---\nSent from embedcraft.github.io';
+    window.location.href = 'mailto:' + CONTACT_EMAIL +
+      '?subject=' + encodeURIComponent(subject) +
+      '&body=' + encodeURIComponent(body);
     var okBox=document.getElementById('formOk');
-    okBox.style.display='block'; this.reset();
+    okBox.style.display='block';
     okBox.scrollIntoView({behavior:'smooth', block:'center'});
-    setTimeout(function(){ okBox.style.display='none'; }, 6000);
+    setTimeout(function(){ okBox.style.display='none'; }, 12000);
   });
 
   onScroll();
