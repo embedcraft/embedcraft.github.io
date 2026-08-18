@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | DigiEdge</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232f5bff'/%3E%3Cstop offset='100%25' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='44' font-family='Helvetica,Arial,sans-serif' font-size='26' font-weight='bold' fill='white' text-anchor='middle'%3EDE%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/site.css">
+<style>
+  .edit-form{margin-top:14px;display:none;flex-direction:column;gap:10px;}
+  .edit-form.show{display:flex;}
+  .char-count{font-size:.74rem;color:var(--text-dim);text-align:right;margin-top:-6px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-wrap">
+    <a class="logo" href="index.html"><span class="mark">DE</span> <div class="logo-text">DigiEdge<span class="ltag">Silicon to Intelligence</span></div></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="blog.html">Blog</a>
+    </nav>
+    <button class="nav-ghost" id="signOutBtn" style="display:none;">Sign out</button>
+  </div>
+</header>
+
+<section>
+  <div class="wide">
+    <div class="alert alert-error" id="cfgAlert">
+      Blog accounts aren't configured yet — the site owner needs to connect a Firebase project (see <code>README.md</code>).
+    </div>
+
+    <div id="authGate" class="skeleton">Checking your session…</div>
+
+    <div id="dashboardBody" style="display:none;">
+      <div class="page-head" style="text-align:left;max-width:none;margin-bottom:34px;">
+        <span class="eyebrow">Dashboard</span>
+        <h1>Hey, <span id="userName">there</span> — write something.</h1>
+        <p>Posts you publish here appear immediately on the public <a href="blog.html">blog</a>.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:40px;">
+        <div class="alert alert-error" id="postErrAlert"></div>
+        <div class="alert alert-ok" id="postOkAlert">Post published.</div>
+        <form id="postForm">
+          <label>Title</label>
+          <input type="text" id="p-title" placeholder="What's this post about?" maxlength="200" required>
+          <label>Content</label>
+          <textarea id="p-content" placeholder="Write your post…" maxlength="20000" style="min-height:180px;" required></textarea>
+          <button type="submit" class="btn btn-primary" id="postSubmitBtn" style="align-self:flex-start;">Publish post</button>
+        </form>
+      </div>
+
+      <h2 style="font-size:1.2rem;font-weight:800;margin-bottom:16px;">My posts</h2>
+      <div id="myPosts"><div class="skeleton">Loading your posts…</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-bottom">
+    <div>&copy; 2026 DigiEdge.</div>
+    <div><a href="index.html">Back to homepage</a></div>
+  </div>
+</footer>
+
+<script src="js/firebase-config.js"></script>
+<script type="module">
+  import { onAuth, logOut } from './js/auth.js';
+  import { createPost, updatePost, deletePost, listPostsByAuthor, validatePost, formatDate } from './js/posts.js';
+
+  var cfgAlert = document.getElementById('cfgAlert');
+  var authGate = document.getElementById('authGate');
+  var body = document.getElementById('dashboardBody');
+  var signOutBtn = document.getElementById('signOutBtn');
+  var userNameEl = document.getElementById('userName');
+  var myPostsEl = document.getElementById('myPosts');
+  var postForm = document.getElementById('postForm');
+  var postSubmitBtn = document.getElementById('postSubmitBtn');
+  var postErrAlert = document.getElementById('postErrAlert');
+  var postOkAlert = document.getElementById('postOkAlert');
+
+  var currentUser = null;
+
+  if(!window.FIREBASE_CONFIGURED){
+    cfgAlert.classList.add('show');
+    authGate.textContent = 'Sign-in is disabled until the site owner connects Firebase.';
+  } else {
+    onAuth(function(user){
+      if(!user){
+        window.location.href = 'login.html';
+        return;
+      }
+      currentUser = user;
+      userNameEl.textContent = user.displayName || user.email;
+      authGate.style.display = 'none';
+      body.style.display = 'block';
+      signOutBtn.style.display = 'inline-block';
+      loadMyPosts();
+    });
+
+    signOutBtn.addEventListener('click', function(){
+      logOut().then(function(){ window.location.href = 'index.html'; });
+    });
+  }
+
+  function esc(s){
+    var d = document.createElement('div');
+    d.textContent = s == null ? '' : s;
+    return d.innerHTML;
+  }
+
+  function loadMyPosts(){
+    myPostsEl.innerHTML = '<div class="skeleton">Loading your posts…</div>';
+    listPostsByAuthor(currentUser.uid).then(function(posts){
+      if(!posts.length){
+        myPostsEl.innerHTML = '<div class="empty-note">You haven\'t published anything yet — your first post is right above.</div>';
+        return;
+      }
+      myPostsEl.innerHTML = '';
+      posts.forEach(function(post){ myPostsEl.appendChild(renderPostCard(post)); });
+    }).catch(function(err){
+      myPostsEl.innerHTML = '<div class="empty-note">Couldn\'t load your posts: ' + esc(err.message || err) + '</div>';
+    });
+  }
+
+  function renderPostCard(post){
+    var card = document.createElement('div');
+    card.className = 'post-card';
+
+    var meta = document.createElement('div');
+    meta.className = 'pmeta';
+    meta.textContent = formatDate(post.createdAt) || 'Just now';
+    card.appendChild(meta);
+
+    var h3 = document.createElement('h3');
+    h3.textContent = post.title;
+    card.appendChild(h3);
+
+    var pbody = document.createElement('div');
+    pbody.className = 'pbody clamped';
+    pbody.textContent = post.content;
+    card.appendChild(pbody);
+
+    var actions = document.createElement('div');
+    actions.className = 'pactions';
+    var editBtn = document.createElement('button');
+    editBtn.className = 'btn btn-outline btn-small';
+    editBtn.textContent = 'Edit';
+    var delBtn = document.createElement('button');
+    delBtn.className = 'btn-danger';
+    delBtn.textContent = 'Delete';
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    card.appendChild(actions);
+
+    var editForm = document.createElement('div');
+    editForm.className = 'edit-form';
+    var titleInput = document.createElement('input');
+    titleInput.type = 'text'; titleInput.value = post.title; titleInput.maxLength = 200;
+    var contentInput = document.createElement('textarea');
+    contentInput.value = post.content; contentInput.style.minHeight = '140px'; contentInput.maxLength = 20000;
+    var saveRow = document.createElement('div');
+    saveRow.style.display = 'flex'; saveRow.style.gap = '8px';
+    var saveBtn = document.createElement('button');
+    saveBtn.className = 'btn btn-primary btn-small'; saveBtn.textContent = 'Save changes';
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn btn-outline btn-small'; cancelBtn.type = 'button'; cancelBtn.textContent = 'Cancel';
+    saveRow.appendChild(saveBtn); saveRow.appendChild(cancelBtn);
+    editForm.appendChild(titleInput);
+    editForm.appendChild(contentInput);
+    editForm.appendChild(saveRow);
+    card.appendChild(editForm);
+
+    editBtn.addEventListener('click', function(){
+      editForm.classList.toggle('show');
+    });
+    cancelBtn.addEventListener('click', function(){
+      editForm.classList.remove('show');
+      titleInput.value = post.title;
+      contentInput.value = post.content;
+    });
+    saveBtn.addEventListener('click', function(){
+      var err = validatePost(titleInput.value, contentInput.value);
+      if(err){ alert(err); return; }
+      saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+      updatePost(post.id, titleInput.value, contentInput.value).then(function(){
+        post.title = titleInput.value.trim();
+        post.content = contentInput.value.trim();
+        h3.textContent = post.title;
+        pbody.textContent = post.content;
+        editForm.classList.remove('show');
+      }).catch(function(err){
+        alert('Could not save: ' + (err.message || err));
+      }).finally(function(){
+        saveBtn.disabled = false; saveBtn.textContent = 'Save changes';
+      });
+    });
+    delBtn.addEventListener('click', function(){
+      if(!confirm('Delete this post? This can\'t be undone.')) return;
+      delBtn.disabled = true; delBtn.textContent = 'Deleting…';
+      deletePost(post.id).then(function(){
+        card.remove();
+        if(!myPostsEl.children.length){
+          myPostsEl.innerHTML = '<div class="empty-note">You haven\'t published anything yet — your first post is right above.</div>';
+        }
+      }).catch(function(err){
+        alert('Could not delete: ' + (err.message || err));
+        delBtn.disabled = false; delBtn.textContent = 'Delete';
+      });
+    });
+
+    return card;
+  }
+
+  postForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    postErrAlert.classList.remove('show');
+    postOkAlert.classList.remove('show');
+    var titleEl = document.getElementById('p-title');
+    var contentEl = document.getElementById('p-content');
+    var err = validatePost(titleEl.value, contentEl.value);
+    if(err){
+      postErrAlert.textContent = err;
+      postErrAlert.classList.add('show');
+      return;
+    }
+    postSubmitBtn.disabled = true;
+    postSubmitBtn.textContent = 'Publishing…';
+    createPost(currentUser.uid, currentUser.displayName || currentUser.email, titleEl.value, contentEl.value)
+      .then(function(){
+        postOkAlert.classList.add('show');
+        titleEl.value = '';
+        contentEl.value = '';
+        loadMyPosts();
+      })
+      .catch(function(err){
+        postErrAlert.textContent = 'Could not publish: ' + (err.message || err);
+        postErrAlert.classList.add('show');
+      })
+      .finally(function(){
+        postSubmitBtn.disabled = false;
+        postSubmitBtn.textContent = 'Publish post';
+      });
+  });
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://embedcraft.github.io/sitemap.xml
+Sitemap: https://digiedge.github.io/sitemap.xml
