@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop | DigiEdge</title>
+<meta name="description" content="Dev boards, sensor modules and prototyping kits, plus bookable embedded engineering consulting packages — from the DigiEdge team.">
+<link rel="canonical" href="https://digiedge.github.io/shop.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232f5bff'/%3E%3Cstop offset='100%25' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='44' font-family='Helvetica,Arial,sans-serif' font-size='26' font-weight='bold' fill='white' text-anchor='middle'%3EDE%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/site.css">
+<script src="js/theme.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="nav-wrap">
+    <a class="logo" href="index.html"><span class="mark">DE</span> <div class="logo-text">DigiEdge<span class="ltag">Silicon to Intelligence</span></div></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="blog.html">Blog</a>
+      <a href="index.html#services">Services</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+      <button class="icon-btn" id="cartOpenBtn" title="Cart">🛒<span class="cart-badge"></span></button>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="container">
+    <div class="page-head" style="text-align:left;max-width:none;">
+      <span class="eyebrow">Shop</span>
+      <h1>Boards, modules &amp; consulting packages</h1>
+      <p>Hardware we actually use in our own builds, plus engineering time you can book directly — no separate quote needed.</p>
+    </div>
+
+    <div class="alert alert-error" id="cfgAlert">
+      Checkout isn't live yet — the site owner needs to connect Razorpay + deploy the order functions (see <code>README.md</code>, "Shop &amp; payments setup"). You can still browse the catalog and build a cart below.
+    </div>
+
+    <div class="cat-pills" id="catPills"></div>
+
+    <div class="shop-toolbar">
+      <input type="search" id="searchBox" placeholder="Search products…">
+      <span class="form-note" id="productCount"></span>
+    </div>
+
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-bottom">
+    <div>&copy; 2026 DigiEdge.</div>
+    <div><a href="index.html">Back to homepage</a></div>
+  </div>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <h3>Your cart</h3>
+    <button class="icon-btn" id="cartCloseBtn" title="Close">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="subtotal-row"><span>Subtotal</span><span id="cartSubtotal">₹0</span></div>
+    <a class="btn btn-primary btn-block" href="checkout.html" id="checkoutBtn">Checkout</a>
+  </div>
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/whatsapp.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  if(window.RAZORPAY_CONFIGURED){
+    document.getElementById('cfgAlert').style.display = 'none';
+  } else {
+    document.getElementById('cfgAlert').classList.add('show');
+  }
+
+  var catPills = document.getElementById('catPills');
+  var searchBox = document.getElementById('searchBox');
+  var productGrid = document.getElementById('productGrid');
+  var productCount = document.getElementById('productCount');
+  var activeCategory = 'All';
+
+  function esc(s){
+    var d = document.createElement('div');
+    d.textContent = s == null ? '' : s;
+    return d.innerHTML;
+  }
+
+  catPills.innerHTML = ['All'].concat(window.PRODUCT_CATEGORIES).map(function(c){
+    return '<button type="button" class="cat-pill' + (c === 'All' ? ' active' : '') + '" data-cat="' + c + '">' + c + '</button>';
+  }).join('');
+  catPills.addEventListener('click', function(e){
+    var btn = e.target.closest('.cat-pill'); if(!btn) return;
+    activeCategory = btn.getAttribute('data-cat');
+    catPills.querySelectorAll('.cat-pill').forEach(function(p){ p.classList.toggle('active', p === btn); });
+    render();
+  });
+  searchBox.addEventListener('input', render);
+
+  function render(){
+    var q = searchBox.value.trim().toLowerCase();
+    var list = window.PRODUCTS.filter(function(p){
+      if(activeCategory !== 'All' && p.category !== activeCategory) return false;
+      if(!q) return true;
+      return p.name.toLowerCase().indexOf(q) !== -1 || p.description.toLowerCase().indexOf(q) !== -1;
+    });
+    productCount.textContent = list.length + (list.length === 1 ? ' product' : ' products');
+    productGrid.innerHTML = list.map(function(p){
+      return '<div class="product-card">' +
+        '<div class="product-thumb" style="background:' + window.categoryGradient(p.category) + '">' + esc(p.icon) + '</div>' +
+        '<div class="product-body">' +
+          '<span class="cat-badge">' + esc(p.category) + '</span>' +
+          '<h3>' + esc(p.name) + '</h3>' +
+          '<p>' + esc(p.description) + '</p>' +
+          '<div class="product-price-row">' +
+            '<div class="product-price">' + window.formatINR(p.price) + ' <span class="unit">/ ' + esc(p.unit) + '</span></div>' +
+            (p.physical ? '<span class="stock-note">In stock</span>' : '') +
+          '</div>' +
+          '<button class="btn btn-primary btn-block" data-add="' + p.id + '">Add to cart</button>' +
+        '</div>' +
+      '</div>';
+    }).join('') || '<div class="empty-note">No products match your search.</div>';
+  }
+  render();
+
+  productGrid.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-add]'); if(!btn) return;
+    window.Cart.add(btn.getAttribute('data-add'), 1);
+    openCart();
+    var original = btn.textContent;
+    btn.textContent = 'Added ✓';
+    setTimeout(function(){ btn.textContent = original; }, 1200);
+  });
+
+  /* ---------- CART DRAWER ---------- */
+  var overlay = document.getElementById('cartOverlay');
+  var drawer = document.getElementById('cartDrawer');
+  var cartItems = document.getElementById('cartItems');
+  var cartSubtotal = document.getElementById('cartSubtotal');
+
+  function openCart(){
+    renderCart();
+    overlay.classList.add('open');
+    drawer.classList.add('open');
+  }
+  function closeCart(){
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+  }
+  document.getElementById('cartOpenBtn').addEventListener('click', openCart);
+  document.getElementById('cartCloseBtn').addEventListener('click', closeCart);
+  overlay.addEventListener('click', closeCart);
+
+  function renderCart(){
+    var lines = window.Cart.lines();
+    if(!lines.length){
+      cartItems.innerHTML = '<div class="empty-note">Your cart is empty.</div>';
+    } else {
+      cartItems.innerHTML = lines.map(function(l){
+        return '<div class="cart-line" data-id="' + l.product.id + '">' +
+          '<div class="clthumb" style="background:' + window.categoryGradient(l.product.category) + '">' + esc(l.product.icon) + '</div>' +
+          '<div class="clbody">' +
+            '<div class="cltitle">' + esc(l.product.name) + '</div>' +
+            '<div class="clrow">' +
+              '<div class="qty-ctrl">' +
+                '<button type="button" data-qty="-1">−</button>' +
+                '<span>' + l.qty + '</span>' +
+                '<button type="button" data-qty="1">+</button>' +
+              '</div>' +
+              '<span>' + window.formatINR(l.product.price * l.qty) + '</span>' +
+            '</div>' +
+            '<span class="cl-remove" data-remove="1">Remove</span>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+    cartSubtotal.textContent = window.formatINR(window.Cart.subtotal());
+  }
+
+  cartItems.addEventListener('click', function(e){
+    var line = e.target.closest('.cart-line'); if(!line) return;
+    var id = line.getAttribute('data-id');
+    var qtyBtn = e.target.closest('[data-qty]');
+    if(qtyBtn){
+      var current = window.Cart.lines().find(function(l){ return l.product.id === id; });
+      if(current) window.Cart.setQty(id, current.qty + Number(qtyBtn.getAttribute('data-qty')));
+      renderCart();
+      return;
+    }
+    if(e.target.closest('[data-remove]')){
+      window.Cart.remove(id);
+      renderCart();
+    }
+  });
+
+  document.addEventListener('cart:change', renderCart);
+})();
+</script>
+</body>
+</html>

@@ -8,8 +8,9 @@
 <link rel="canonical" href="https://digiedge.github.io/blog.html">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232f5bff'/%3E%3Cstop offset='100%25' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='44' font-family='Helvetica,Arial,sans-serif' font-size='26' font-weight='bold' fill='white' text-anchor='middle'%3EDE%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/site.css">
+<script src="js/theme.js"></script>
 <style>
-  .blog-toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:30px;}
+  .blog-toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
   .blog-toolbar input{max-width:280px;}
 </style>
 </head>
@@ -21,8 +22,11 @@
     <nav>
       <a href="index.html">Home</a>
       <a href="index.html#capabilities">Capabilities</a>
+      <a href="shop.html">Shop</a>
     </nav>
-    <div style="display:flex;gap:10px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+      <a class="icon-btn" href="shop.html" title="Cart">🛒<span class="cart-badge"></span></a>
       <a class="nav-cta" id="navWrite" href="signup.html">Write a post</a>
     </div>
   </div>
@@ -39,6 +43,8 @@
     <div class="alert alert-error" id="cfgAlert">
       The blog isn't connected to a database yet — the site owner needs to set up a Firebase project (see <code>README.md</code>). No posts can be loaded or published until then.
     </div>
+
+    <div class="cat-pills" id="catPills"></div>
 
     <div class="blog-toolbar">
       <input type="search" id="searchBox" placeholder="Search posts…">
@@ -57,15 +63,31 @@
 </footer>
 
 <script src="js/firebase-config.js"></script>
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/whatsapp.js"></script>
 <script type="module">
   import { onAuth } from './js/auth.js';
-  import { listAllPosts, formatDate } from './js/posts.js';
+  import { listAllPosts, formatDate, POST_CATEGORIES } from './js/posts.js';
 
   var postsList = document.getElementById('postsList');
   var postCount = document.getElementById('postCount');
   var searchBox = document.getElementById('searchBox');
   var navWrite = document.getElementById('navWrite');
+  var catPills = document.getElementById('catPills');
   var allPosts = [];
+  var activeCategory = 'All';
+
+  catPills.innerHTML = ['All'].concat(POST_CATEGORIES).map(function(c){
+    return '<button type="button" class="cat-pill' + (c === 'All' ? ' active' : '') + '" data-cat="' + c + '">' + c + '</button>';
+  }).join('');
+  catPills.addEventListener('click', function(e){
+    var btn = e.target.closest('.cat-pill');
+    if(!btn) return;
+    activeCategory = btn.getAttribute('data-cat');
+    catPills.querySelectorAll('.cat-pill').forEach(function(p){ p.classList.toggle('active', p === btn); });
+    applyFilters();
+  });
 
   if(!window.FIREBASE_CONFIGURED){
     document.getElementById('cfgAlert').classList.add('show');
@@ -108,7 +130,11 @@
 
       var meta = document.createElement('div');
       meta.className = 'pmeta';
-      meta.textContent = (post.authorName || 'Anonymous') + ' · ' + (formatDate(post.createdAt) || 'Just now');
+      var catBadge = document.createElement('span');
+      catBadge.className = 'cat-badge';
+      catBadge.textContent = post.category || 'Other';
+      meta.appendChild(catBadge);
+      meta.appendChild(document.createTextNode((post.authorName || 'Anonymous') + ' · ' + (formatDate(post.createdAt) || 'Just now')));
       card.appendChild(meta);
 
       var h3 = document.createElement('h3');
@@ -133,15 +159,19 @@
     });
   }
 
-  searchBox.addEventListener('input', function(){
+  function applyFilters(){
     var q = searchBox.value.trim().toLowerCase();
-    if(!q){ render(allPosts); return; }
-    render(allPosts.filter(function(p){
+    var filtered = allPosts.filter(function(p){
+      if(activeCategory !== 'All' && (p.category || 'Other') !== activeCategory) return false;
+      if(!q) return true;
       return (p.title || '').toLowerCase().indexOf(q) !== -1 ||
              (p.content || '').toLowerCase().indexOf(q) !== -1 ||
              (p.authorName || '').toLowerCase().indexOf(q) !== -1;
-    }));
-  });
+    });
+    render(filtered);
+  }
+
+  searchBox.addEventListener('input', applyFilters);
 </script>
 </body>
 </html>

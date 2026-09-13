@@ -6,6 +6,7 @@ import { initFirebase } from "./auth.js";
 
 const MAX_TITLE = 200;
 const MAX_CONTENT = 20000;
+export const POST_CATEGORIES = ["Firmware", "Edge AI", "Wireless", "Boards", "Tools", "Other"];
 
 export function validatePost(title, content){
   title = (title || '').trim();
@@ -17,11 +18,12 @@ export function validatePost(title, content){
   return null;
 }
 
-export async function createPost(uid, authorName, title, content){
+export async function createPost(uid, authorName, title, content, category){
   const { db } = initFirebase();
   return addDoc(collection(db, "posts"), {
     title: title.trim(),
     content: content.trim(),
+    category: POST_CATEGORIES.indexOf(category) !== -1 ? category : "Other",
     authorId: uid,
     authorName: authorName || "Anonymous",
     createdAt: serverTimestamp(),
@@ -29,11 +31,12 @@ export async function createPost(uid, authorName, title, content){
   });
 }
 
-export async function updatePost(postId, title, content){
+export async function updatePost(postId, title, content, category){
   const { db } = initFirebase();
   return updateDoc(doc(db, "posts", postId), {
     title: title.trim(),
     content: content.trim(),
+    category: POST_CATEGORIES.indexOf(category) !== -1 ? category : "Other",
     updatedAt: serverTimestamp()
   });
 }

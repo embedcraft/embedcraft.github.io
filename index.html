@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DigiEdge | Silicon to Intelligence</title>
-<meta name="description" content="DigiEdge — silicon to intelligence. Firmware, embedded systems and edge AI design for IoT and industrial hardware teams: bare-metal/RTOS firmware, board bring-up, low-power design, wireless integration, and on-device AI with TensorFlow Lite Micro, CMSIS-NN and embedded LLMs.">
+<meta name="description" content="DigiEdge — silicon to intelligence. Firmware, embedded systems and edge AI design for IoT and industrial hardware teams: bare-metal/RTOS firmware, board bring-up, low-power design, wireless integration, and on-device AI. Shop dev boards and sensor modules, or book a consulting package directly.">
 <meta name="keywords" content="embedded systems design, firmware development, RTOS firmware, STM32 firmware, ESP32 development, board bring-up, driver development, low-power design, BLE Wi-Fi LoRa integration, PCB firmware co-design, industrial IoT, edge AI, embedded LLM, TinyML, CMSIS-NN, QNN, TensorFlow Lite Micro, embedded consultancy">
 <meta name="author" content="DigiEdge">
 <meta name="robots" content="index, follow">
@@ -41,6 +41,7 @@
   "serviceType": ["Firmware Development","Board Bring-up","Low-Power Design","Wireless Integration","PCB & Firmware Co-Design","Edge AI & Embedded LLM Development"]
 }
 </script>
+<script src="js/theme.js"></script>
 <style>
   :root{
     --bg:#ffffff;
@@ -53,13 +54,28 @@
     --accent-soft:#eaefff;
     --ai:#7c3aed;
     --ai-soft:#f3ecff;
+    --card-bg:#ffffff;
     --font:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Helvetica,Arial,sans-serif;
     --mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+  }
+  [data-theme="dark"]{
+    --bg:#0b0f1a;
+    --bg-alt:#0f1524;
+    --line:#212a3f;
+    --text:#eef1f8;
+    --text-dim:#93a0bd;
+    --accent:#5b7fff;
+    --accent-dark:#7d99ff;
+    --accent-soft:#182549;
+    --ai:#a78bfa;
+    --ai-soft:#241c3f;
+    --card-bg:#111729;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{
     background:var(--bg);color:var(--text);font-family:var(--font);
     line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+    transition:background-color .25s,color .25s;
   }
   a{color:inherit;text-decoration:none;}
   ::selection{background:var(--ai-soft);}
@@ -73,8 +89,9 @@
   header{
     position:sticky;top:0;z-index:100;background:rgba(255,255,255,.85);
     backdrop-filter:blur(10px);border-bottom:1px solid transparent;
-    transition:border-color .3s, box-shadow .3s;
+    transition:border-color .3s, box-shadow .3s, background-color .3s;
   }
+  [data-theme="dark"] header{background:rgba(11,15,26,.82);}
   header.scrolled{border-bottom-color:var(--line);box-shadow:0 4px 20px -10px rgba(15,23,42,.15);}
   .nav-wrap{max-width:1200px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
   .logo{font-weight:800;font-size:1.12rem;letter-spacing:-.3px;display:flex;align-items:center;gap:9px;cursor:pointer;}
@@ -93,14 +110,18 @@
   nav a:hover::after,nav a.active::after{width:100%;}
   .nav-cta{background:var(--accent);color:#fff;padding:9px 18px;border-radius:7px;font-size:.88rem;font-weight:600;transition:.25s;white-space:nowrap;cursor:pointer;}
   .nav-cta:hover{background:var(--accent-dark);transform:translateY(-2px);box-shadow:0 8px 20px -8px var(--accent);}
-  .nav-ghost{border:1.5px solid var(--line);padding:8px 16px;border-radius:7px;font-size:.86rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text);white-space:nowrap;transition:.2s;}
+  .nav-ghost{border:1.5px solid var(--line);padding:8px 16px;border-radius:7px;font-size:.86rem;font-weight:600;cursor:pointer;background:var(--card-bg);color:var(--text);white-space:nowrap;transition:.2s;}
   .nav-ghost:hover{border-color:var(--ai);color:var(--ai);}
+  .icon-btn{width:38px;height:38px;border-radius:8px;border:1.5px solid var(--line);background:var(--card-bg);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:.2s;flex-shrink:0;position:relative;}
+  .icon-btn:hover{border-color:var(--ai);color:var(--ai);}
+  .cart-badge{position:absolute;top:-6px;right:-6px;background:linear-gradient(135deg,var(--accent),var(--ai));color:#fff;font-size:.62rem;font-weight:800;line-height:1;min-width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 2px;}
+  .cart-badge:empty,.cart-badge[data-count="0"]{display:none;}
   .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;}
   .burger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:.3s;}
   .burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
   .burger.open span:nth-child(2){opacity:0;}
   .burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-  .mobile-menu{display:none;flex-direction:column;background:#fff;border-bottom:1px solid var(--line);max-height:0;overflow:hidden;transition:max-height .4s;}
+  .mobile-menu{display:none;flex-direction:column;background:var(--card-bg);border-bottom:1px solid var(--line);max-height:0;overflow:hidden;transition:max-height .4s;}
   .mobile-menu a{padding:14px 24px;border-top:1px solid var(--line);font-size:.95rem;cursor:pointer;}
   .mobile-menu.open{max-height:460px;}
 
@@ -124,7 +145,7 @@
   .btn{padding:14px 28px;border-radius:8px;font-size:.95rem;font-weight:600;transition:.25s;display:inline-block;cursor:pointer;border:none;font-family:var(--font);}
   .btn-primary{background:var(--accent);color:#fff;}
   .btn-primary:hover{background:var(--accent-dark);transform:translateY(-2px);box-shadow:0 12px 24px -10px var(--accent);}
-  .btn-outline{border:1.5px solid var(--line);color:var(--text);background:#fff;}
+  .btn-outline{border:1.5px solid var(--line);color:var(--text);background:var(--card-bg);}
   .btn-outline:hover{border-color:var(--ai);color:var(--ai);transform:translateY(-2px);}
 
   /* ---------- MARQUEE ---------- */
@@ -148,7 +169,7 @@
 
   /* ---------- CAPABILITIES ---------- */
   .cap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
-  .cap-card{border:1px solid var(--line);border-radius:12px;padding:24px;background:#fff;transition:transform .3s, box-shadow .3s;position:relative;overflow:hidden;}
+  .cap-card{border:1px solid var(--line);border-radius:12px;padding:24px;background:var(--card-bg);transition:transform .3s, box-shadow .3s;position:relative;overflow:hidden;}
   .cap-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--ai));transform:scaleX(0);transform-origin:left;transition:transform .35s;}
   .cap-card:hover::before{transform:scaleX(1);}
   .cap-card:hover{transform:translateY(-6px);box-shadow:0 22px 44px -24px rgba(15,23,42,.45);}
@@ -176,18 +197,34 @@
 
   /* ---------- HOW WE WORK ---------- */
   .process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;}
-  .process-step{position:relative;padding:26px 22px;border:1px solid var(--line);border-left:none;background:#fff;}
+  .process-step{position:relative;padding:26px 22px;border:1px solid var(--line);border-left:none;background:var(--card-bg);}
   .process-step:first-child{border-left:1px solid var(--line);border-radius:12px 0 0 12px;}
   .process-step:last-child{border-radius:0 12px 12px 0;}
   .process-step .pnum{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--ai));color:#fff;font-family:var(--mono);font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
   .process-step h3{font-size:1rem;font-weight:700;margin-bottom:8px;}
   .process-step p{color:var(--text-dim);font-size:.85rem;}
-  .process-step:not(:last-child)::after{content:'→';position:absolute;top:26px;right:-13px;z-index:2;color:var(--text-dim);background:#fff;border:1px solid var(--line);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;}
+  .process-step:not(:last-child)::after{content:'→';position:absolute;top:26px;right:-13px;z-index:2;color:var(--text-dim);background:var(--card-bg);border:1px solid var(--line);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;}
+
+  /* ---------- PRICING / SERVICES ---------- */
+  .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .price-card{border:1px solid var(--line);border-radius:14px;background:var(--card-bg);padding:30px;display:flex;flex-direction:column;gap:14px;position:relative;transition:transform .3s,box-shadow .3s;}
+  .price-card:hover{transform:translateY(-6px);box-shadow:0 22px 44px -24px rgba(15,23,42,.45);}
+  .price-card.popular{border-color:var(--ai);}
+  .price-card .pop-badge{position:absolute;top:-12px;right:24px;background:linear-gradient(135deg,var(--accent),var(--ai));color:#fff;font-size:.66rem;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:5px 12px;border-radius:100px;}
+  .price-card h3{font-size:1.05rem;font-weight:800;}
+  .price-card .pamount{font-size:1.8rem;font-weight:800;letter-spacing:-.5px;}
+  .price-card .pamount .unit{font-size:.78rem;color:var(--text-dim);font-weight:600;}
+  .price-card p{color:var(--text-dim);font-size:.88rem;margin:0;}
+  .price-card ul{list-style:none;display:flex;flex-direction:column;gap:8px;margin:4px 0;}
+  .price-card li{font-size:.85rem;color:var(--text-dim);padding-left:22px;position:relative;}
+  .price-card li::before{content:'✓';position:absolute;left:0;color:var(--accent);font-weight:800;}
+  @media(max-width:900px){.pricing-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:600px){.pricing-grid{grid-template-columns:1fr;}}
 
   /* ---------- ABOUT / FOUNDERS ---------- */
   .founders-intro{max-width:760px;margin:0 auto 46px;text-align:center;color:var(--text-dim);font-size:1.02rem;}
   .founders-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;}
-  .founder-card{border:1px solid var(--line);border-radius:14px;padding:30px;background:#fff;}
+  .founder-card{border:1px solid var(--line);border-radius:14px;padding:30px;background:var(--card-bg);}
   .founder-card .fphoto{width:76px;height:76px;border-radius:50%;object-fit:cover;margin-bottom:16px;border:2px solid var(--line);}
   .founder-card .fname{font-size:1.15rem;font-weight:800;margin-bottom:2px;}
   .founder-card .frole{color:var(--ai);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;}
@@ -196,7 +233,7 @@
 
   /* ---------- BLOG ---------- */
   .blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
-  .blog-card{border:1px solid var(--line);border-radius:12px;padding:24px;background:#fff;transition:.3s;}
+  .blog-card{border:1px solid var(--line);border-radius:12px;padding:24px;background:var(--card-bg);transition:.3s;}
   .blog-card:hover{transform:translateY(-5px);box-shadow:0 18px 36px -20px rgba(15,23,42,.35);}
   .blog-card .bbadge{display:inline-block;font-family:var(--mono);font-size:.66rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text-dim);background:var(--bg-alt);border:1px solid var(--line);border-radius:5px;padding:4px 9px;margin-bottom:14px;}
   .blog-card h3{font-size:.98rem;font-weight:700;margin-bottom:8px;}
@@ -208,7 +245,7 @@
   .contact-info .item .k{color:var(--accent);font-size:.78rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
   form{display:flex;flex-direction:column;gap:14px;background:var(--bg-alt);border:1px solid var(--line);border-radius:14px;padding:30px;}
   label{font-size:.8rem;color:var(--text-dim);font-weight:600;margin-bottom:-8px;}
-  input,textarea,select{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 14px;color:var(--text);font-family:var(--font);font-size:.92rem;width:100%;transition:.2s;}
+  input,textarea,select{background:var(--card-bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;color:var(--text);font-family:var(--font);font-size:.92rem;width:100%;transition:.2s;}
   input:focus,textarea:focus,select:focus{outline:none;border-color:var(--ai);box-shadow:0 0 0 3px var(--ai-soft);}
   input.err,textarea.err{border-color:#e11d48;box-shadow:0 0 0 3px #ffe4e9;}
   textarea{resize:vertical;min-height:110px;}
@@ -216,6 +253,7 @@
   .submit-btn:hover{background:var(--accent-dark);transform:translateY(-2px);}
   .form-note{color:var(--text-dim);font-size:.78rem;margin-top:-4px;}
   .form-ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:10px;padding:14px;font-size:.9rem;display:none;animation:fadeUp .4s ease;}
+  [data-theme="dark"] .form-ok{background:#0f2a20;border-color:#134e37;color:#6ee7b7;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 
   footer{border-top:1px solid var(--line);background:var(--bg-alt);}
@@ -262,10 +300,14 @@
       <a data-go="capabilities">Capabilities</a>
       <a data-go="project">Project</a>
       <a data-go="process">How We Work</a>
+      <a data-go="services">Services</a>
       <a data-go="about">About</a>
       <a href="blog.html">Blog</a>
+      <a href="shop.html">Shop</a>
     </nav>
     <div style="display:flex;align-items:center;gap:10px;">
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+      <a class="icon-btn" href="shop.html" title="Cart">🛒<span class="cart-badge"></span></a>
       <a class="nav-cta" data-go="contact">Book a consult</a>
       <div class="burger" id="burger"><span></span><span></span><span></span></div>
     </div>
@@ -274,8 +316,10 @@
     <a data-go="capabilities">Capabilities</a>
     <a data-go="project">Project</a>
     <a data-go="process">How We Work</a>
+    <a data-go="services">Services</a>
     <a data-go="about">About</a>
     <a href="blog.html">Blog</a>
+    <a href="shop.html">Shop</a>
     <a data-go="contact">Book a consult</a>
   </div>
 </header>
@@ -298,6 +342,10 @@
 
 <div class="ai-banner">
   <div class="ai-banner-inner"><strong>New:</strong> Edge AI &amp; embedded LLM development — TensorFlow, TFLite Micro, CMSIS-NN, QNN. <a data-go="capabilities">See capabilities →</a></div>
+</div>
+
+<div class="ai-banner" style="background:var(--accent-soft);border-bottom-color:var(--line);">
+  <div class="ai-banner-inner"><strong>🛒 Shop is live:</strong> dev boards, sensor modules &amp; prototyping kits — plus bookable consulting packages. <a href="shop.html">Visit the shop →</a></div>
 </div>
 
 <section id="capabilities">
@@ -377,6 +425,15 @@
   </div>
 </section>
 
+<section id="services">
+  <div class="section-head reveal">
+    <span class="eyebrow">Services</span>
+    <h2>Book engineering time directly</h2>
+    <p>Prefer to skip the back-and-forth? Buy a consulting package straight from the shop — same team, no separate quote needed.</p>
+  </div>
+  <div class="pricing-grid" id="pricingGrid"></div>
+</section>
+
 <section id="about">
   <div class="section-head reveal">
     <span class="eyebrow">About</span>
@@ -429,6 +486,10 @@
       <div class="item"><div class="k">Email</div><div class="v">hello@embedcraftsystems.com</div></div>
       <div class="item"><div class="k">Location</div><div class="v">Gurugram, Haryana, India · Remote-friendly</div></div>
       <div class="item"><div class="k">Response Time</div><div class="v">Within 1 business day</div></div>
+      <div class="item">
+        <div class="k">WhatsApp</div>
+        <a class="wa-inline" href="" id="waInlineLink" target="_blank" rel="noopener">Join our WhatsApp channel</a>
+      </div>
     </div>
     <form id="cform" novalidate>
       <div class="form-ok" id="formOk">Thanks! Your email app should have opened with the message ready — just press send. If nothing opened, email us directly at <strong>hello@embedcraftsystems.com</strong>.</div>
@@ -474,10 +535,12 @@
       <li><a data-go="about">About</a></li>
       <li><a href="blog.html">Blog</a></li>
     </ul></div>
-    <div class="footer-col"><h4>Get In Touch</h4><ul>
+    <div class="footer-col"><h4>Shop &amp; Services</h4><ul>
+      <li><a href="shop.html">Dev boards &amp; modules</a></li>
+      <li><a data-go="services">Consulting packages</a></li>
       <li><a data-go="contact">Book a consult</a></li>
       <li><a href="mailto:hello@embedcraftsystems.com">hello@embedcraftsystems.com</a></li>
-      <li><a href="signup.html">Create account</a></li>
+      <li><a href="https://whatsapp.com/channel/0029VbDjFSlB4hdZkyE6DH3L" target="_blank" rel="noopener">WhatsApp channel</a></li>
     </ul></div>
   </div>
   <div class="footer-bottom">
@@ -488,6 +551,9 @@
 
 <button id="toTop" title="Back to top">↑</button>
 
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/whatsapp.js"></script>
 <script>
 (function(){
   "use strict";
@@ -613,6 +679,34 @@
       '<div class="tags">'+c.g.map(function(g){return '<span>'+g+'</span>';}).join('')+'</div></div>';
   }).join('');
   document.querySelectorAll('#capGrid .reveal').forEach(function(el,i){
+    el.style.transitionDelay=(i%3*70)+'ms'; io.observe(el);
+  });
+
+  /* ---------- 6b. WHATSAPP INLINE LINK ---------- */
+  var waInline = document.getElementById('waInlineLink');
+  if(waInline && window.WHATSAPP_LINK){
+    waInline.href = window.WHATSAPP_LINK;
+    waInline.innerHTML = window.whatsappIconSVG + '<span>Join our WhatsApp channel</span>';
+  }
+
+  /* ---------- 7b. SERVICES / PRICING CARDS ---------- */
+  var consultProducts = window.PRODUCTS.filter(function(p){ return p.category === 'Consultation'; });
+  document.getElementById('pricingGrid').innerHTML = consultProducts.map(function(p, i){
+    var popular = i === 1;
+    return '<div class="price-card reveal' + (popular ? ' popular' : '') + '">' +
+      (popular ? '<span class="pop-badge">Most booked</span>' : '') +
+      '<h3>' + p.name + '</h3>' +
+      '<div class="pamount">' + formatINR(p.price) + ' <span class="unit">/ ' + p.unit + '</span></div>' +
+      '<p>' + p.description + '</p>' +
+      '<button class="btn ' + (popular ? 'btn-primary' : 'btn-outline') + '" data-book="' + p.id + '">Book this package →</button>' +
+      '</div>';
+  }).join('');
+  document.getElementById('pricingGrid').addEventListener('click', function(e){
+    var btn = e.target.closest('[data-book]'); if(!btn) return;
+    window.Cart.add(btn.getAttribute('data-book'), 1);
+    window.location.href = 'checkout.html';
+  });
+  document.querySelectorAll('#pricingGrid .reveal').forEach(function(el,i){
     el.style.transitionDelay=(i%3*70)+'ms'; io.observe(el);
   });
 

@@ -25,3 +25,15 @@ window.FIREBASE_CONFIG = {
 };
 
 window.FIREBASE_CONFIGURED = window.FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY";
+
+/*
+  Razorpay public key (Key ID only — never put the Key Secret here, it
+  belongs server-side in Cloud Functions config, see functions/ and
+  README.md "Shop & payments setup").
+
+  Get this from the Razorpay dashboard -> Settings -> API Keys, after
+  deploying functions/ (createOrder, verifyPayment). Until it's filled in,
+  shop.html / checkout.html show a "checkout isn't live yet" notice.
+*/
+window.RAZORPAY_KEY_ID = "YOUR_RAZORPAY_KEY_ID";
+window.RAZORPAY_CONFIGURED = window.RAZORPAY_KEY_ID !== "YOUR_RAZORPAY_KEY_ID";

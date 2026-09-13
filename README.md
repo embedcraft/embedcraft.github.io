@@ -62,3 +62,76 @@ want the ability to remove someone else's post for moderation, add an
 That's it — no build step, no server to deploy. Once the config and rules
 are in place, `signup.html` creates real accounts and `dashboard.html` /
 `blog.html` read and write real posts.
+
+Posts also carry a `category` (Firmware, Edge AI, Wireless, Boards, Tools,
+Other) used for the filter pills on `blog.html`. It's not enforced by the
+rules above — any non-empty string is accepted — so no changes are needed
+there unless you want to lock it down further.
+
+## Shop & payments setup (Razorpay + Firebase Functions)
+
+`shop.html` / `checkout.html` sell physical goods (dev boards, modules, kits)
+and bookable consulting packages. Unlike the blog, this needs a small
+server-side piece: a static site can display a catalog on its own, but it
+can't safely compute a price total or confirm a payment actually went
+through — that has to happen somewhere the customer's browser can't tamper
+with it. That's what `functions/` (Firebase Cloud Functions) is for.
+
+Until this is set up, `checkout.html` shows a "checkout isn't live yet"
+notice and the Pay button stays disabled — same pattern as the blog before
+Firebase is connected.
+
+**What you need first:**
+- A [Razorpay](https://razorpay.com) account (test mode is fine to start).
+- The Firebase project from the blog setup above, upgraded to the **Blaze**
+  (pay-as-you-go) plan — Cloud Functions require it. The free tier is
+  generous (2M invocations/month) but Blaze needs a card on file.
+- The [Firebase CLI](https://firebase.google.com/docs/cli) installed
+  (`npm install -g firebase-tools`), logged in (`firebase login`).
+
+**Setup:**
+
+1. In the Firebase console, **Upgrade** the project to Blaze (Settings → Usage and billing).
+2. In the Razorpay dashboard → **Settings → API Keys**, generate a Key ID and Key Secret (use the **Test** keys while you're setting this up).
+3. From the repo root: `firebase use --add` and pick your Firebase project.
+4. Set the Razorpay Key ID as a deploy-time param and the Key Secret as a secret (the secret is never stored in this repo):
+   ```
+   firebase functions:secrets:set RAZORPAY_KEY_SECRET
+   ```
+   and when prompted for `RAZORPAY_KEY_ID`, either export it as an env var before deploying or add a `functions/.env` file (already git-ignored) containing:
+   ```
+   RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+   ```
+5. Install dependencies and deploy: `cd functions && npm install && cd .. && firebase deploy --only functions`.
+6. Put the **public** Key ID (safe to expose client-side — the secret never goes here) into `js/firebase-config.js`:
+   ```js
+   window.RAZORPAY_KEY_ID = "rzp_test_xxxxxxxxxxxx";
+   ```
+7. In **Firestore → Rules**, add the `orders` collection to the existing rules:
+   ```
+   match /orders/{orderId} {
+     allow read, write: if false;
+   }
+   ```
+   Orders are only ever written by the Cloud Functions using the Admin SDK
+   (which bypasses these rules entirely), so `false` here correctly blocks
+   any direct client tampering — the client never reads order docs either;
+   the confirmation on `order-success.html` comes from the function's
+   response, not a Firestore read.
+8. Test a full checkout with a [Razorpay test card](https://razorpay.com/docs/payments/payments/test-card-details/) before switching to live keys (repeat steps 2–6 with your live Key ID/Secret when ready).
+
+**Two places for prices.** There's no build step tying the static frontend
+to the Functions deploy, so the catalog exists in two files:
+`js/products.js` (what's displayed in the shop) and `functions/products.js`
+(the authoritative list `createOrder` actually charges against). If you
+add a product or change a price, update **both** — a mismatch means the
+shop displays one price but charges another.
+
+## WhatsApp button
+
+Every page shows a floating WhatsApp button (bottom-left) plus a link in
+the homepage contact section and footer, all pointing at the link in
+`window.WHATSAPP_LINK` at the top of `js/whatsapp.js`. To change the
+destination (e.g. swap the channel for a support number or group), edit
+that one line — the footer's `mailto`-style hardcoded copy in
+`index.html` should be updated to match if you do.
