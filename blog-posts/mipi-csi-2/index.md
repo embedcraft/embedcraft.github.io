@@ -269,11 +269,11 @@ YUV), each embedding different information and packed differently on the wire.
 That, plus how per-frame **metadata (embedded data)** rides alongside the pixels,
 is covered on the next page:
 
-[**Camera colour formats &amp; pixel metadata →**](post.html?slug=camera-colors)
+[**Camera colour formats &amp; pixel metadata →**](post.html?slug=camera-mipi-csi-2&page=2)
 
 ---
 
 ## References
 * [MIPI Transmissions](https://www.macnica.co.jp/en/business/semiconductor/articles/lattice/142604/)
 * [Camera Sensor Basics](https://developer.ridgerun.com/wiki/index.php/Camera_Sensor_Basics)
-* [OV5640 → STM32H7R7 bring-up guide, using this same CSI-2 interface](post.html?slug=ov5640-stm32-bringup)
+* [OV5640 → STM32H7R7 bring-up guide, using this same CSI-2 interface](post.html?slug=camera-mipi-csi-2&page=4)

@@ -5,8 +5,8 @@
 </h1>
 
 > **Part 3 of the MIPI CSI-2 notes.** Continues from
-> [**CAMERA MIPI CSI-2 →**](post.html?slug=mipi-csi-2) and
-> [**Camera colour formats &amp; pixel metadata →**](post.html?slug=camera-colors). Those two
+> [**CAMERA MIPI CSI-2 →**](post.html?slug=camera-mipi-csi-2&page=1) and
+> [**Camera colour formats &amp; pixel metadata →**](post.html?slug=camera-mipi-csi-2&page=2). Those two
 > pages covered *how pixels move* and *how they are formatted*. This page covers
 > *how the pixels are made to look right*: the exposure, HDR, bit-depth,
 > white-balance, denoise, sharpness and focus controls — what each one changes in
@@ -307,7 +307,7 @@ IMX623-class: log2( 10000 / 3 ) ≈ 11.7 stops  in a single exposure
   next section) — otherwise the extra bits just encode noise.
 - **Bandwidth cost is linear:** RAW12 is 50% more wire data than RAW8 for the same
   resolution and frame rate (see the packet-length table on the
-  [MIPI CSI-2 page](post.html?slug=mipi-csi-2)). Sensors offer a lower-bit "fast" mode for
+  [MIPI CSI-2 page](post.html?slug=camera-mipi-csi-2&page=1)). Sensors offer a lower-bit "fast" mode for
   exactly this reason.
 - **ADC speed:** more bits per conversion can cap the maximum frame rate, so a
   sensor may only offer RAW12 up to some resolution/fps and drop to RAW10 above it.
@@ -331,7 +331,7 @@ high-bit linear frame, and finally **tone-maps** that down to the output format.
 | Method | How | Cost |
 |--------|-----|------|
 | **Temporal bracket** | shoot frames at t, t/4, t/16 back to back, merge in software | motion between frames → ghosting; lower frame rate |
-| **DOL / staggered HDR** | interleave long and short rows in the readout stream (separate VCs — see [embedded data](post.html?slug=camera-colors)) | ~2× line rate / bandwidth |
+| **DOL / staggered HDR** | interleave long and short rows in the readout stream (separate VCs — see [embedded data](post.html?slug=camera-mipi-csi-2&page=2)) | ~2× line rate / bandwidth |
 | **Split-pixel / dual conversion gain** (IMX623) | each pixel has a large + small sub-photodiode, or two read-out gains, captured in one integration | best motion robustness; fixed exposure-ratio granularity |
 
 **Worked example — 3-capture merge, exposure ratio 16:**
@@ -368,7 +368,7 @@ Then a **tone curve** compresses those ~16 stops into the 8- or 10-bit output:
 
 > HDR merge needs the **per-sub-exposure gain and integration time** for that exact
 > frame. That is delivered in the `DT = 0x12` **embedded data lines** described on
-> the [colour-formats page](post.html?slug=camera-colors) — without them the ISP cannot
+> the [colour-formats page](post.html?slug=camera-mipi-csi-2&page=2) — without them the ISP cannot
 > linearise and combine the sub-frames.
 
 ---
@@ -612,6 +612,6 @@ charts, under the same lights.
 
 ---
 
-[◀ Previous: **Camera colour formats &amp; pixel metadata**](post.html?slug=camera-colors)
+[◀ Previous: **Camera colour formats &amp; pixel metadata**](post.html?slug=camera-mipi-csi-2&page=2)
 &nbsp;·&nbsp;
-[Back to **CAMERA MIPI CSI-2**](post.html?slug=mipi-csi-2)
+[Back to **CAMERA MIPI CSI-2**](post.html?slug=camera-mipi-csi-2&page=1)

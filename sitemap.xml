@@ -19,25 +19,25 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://embedcraft.github.io/post.html?slug=mipi-csi-2</loc>
+    <loc>https://embedcraft.github.io/post.html?slug=camera-mipi-csi-2&amp;page=1</loc>
     <lastmod>2026-08-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://embedcraft.github.io/post.html?slug=camera-colors</loc>
+    <loc>https://embedcraft.github.io/post.html?slug=camera-mipi-csi-2&amp;page=2</loc>
     <lastmod>2026-08-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://embedcraft.github.io/post.html?slug=color-balancing</loc>
+    <loc>https://embedcraft.github.io/post.html?slug=camera-mipi-csi-2&amp;page=3</loc>
     <lastmod>2026-08-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://embedcraft.github.io/post.html?slug=ov5640-stm32-bringup</loc>
+    <loc>https://embedcraft.github.io/post.html?slug=camera-mipi-csi-2&amp;page=4</loc>
     <lastmod>2026-08-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

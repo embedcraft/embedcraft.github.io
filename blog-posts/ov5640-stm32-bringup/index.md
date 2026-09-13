@@ -4,7 +4,7 @@
  OV5640 → STM32H7R7 bring-up guide (MIPI CSI-2)
 </h1>
 
-> **A hands-on companion to the [CAMERA MIPI CSI-2](post.html?slug=mipi-csi-2) notes.**
+> **A hands-on companion to the [CAMERA MIPI CSI-2](post.html?slug=camera-mipi-csi-2&page=1) notes.**
 > Same interface, applied to a real bring-up: an **OmniVision OV5640** (1/4", 5 MP,
 > 2592×1944 CMOS) on an **STM32H7R7**, using the STM32Cube HAL, from power rails to a
 > frame sitting in your buffer.
@@ -711,4 +711,4 @@ three overlapping bugs.
 
 ---
 
-[◀ Back to **CAMERA MIPI CSI-2**](post.html?slug=mipi-csi-2)
+[◀ Back to **CAMERA MIPI CSI-2**](post.html?slug=camera-mipi-csi-2&page=1)

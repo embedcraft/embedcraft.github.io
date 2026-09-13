@@ -149,6 +149,17 @@ listed in `js/blog-posts.js`, and are read full-length on `post.html?slug=<slug>
 3. That's it — `blog.html`'s list, search and category filters, and the
    homepage's blog preview, all read from that same manifest.
 
+**Multi-page posts (a series shown as one blog entry).** Give the manifest
+entry a `pages` array instead of a single `file` — each item is `{ title,
+file }`, pointing at its own `blog-posts/<sub-slug>/index.md` (and its own
+`images/`/`files/` subfolder, resolved the same way). `blog.html` then shows
+just one card for the whole series (with a "N pages" badge), and
+`post.html?slug=<slug>&page=<n>` (1-indexed, defaults to 1) reads a specific
+page, with page tabs and prev/next links generated automatically. The
+`camera-mipi-csi-2` entry is a working example — a 4-part series stored as
+four separate post folders (`blog-posts/mipi-csi-2/`, `camera-colors/`,
+`color-balancing/`, `ov5640-stm32-bringup/`) but shown as one blog entry.
+
 **Or use `tools/add_blog.py`** to do all of the above from a source `.md`
 file (e.g. a post written in a separate working folder, TechBlogs-style):
 

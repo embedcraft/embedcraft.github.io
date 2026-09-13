@@ -80,7 +80,7 @@
     return {
       title: p.title, category: p.category, authorName: p.author,
       content: p.summary, dateDisplay: new Date(p.date).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }),
-      isLocal: true, slug: p.slug
+      isLocal: true, slug: p.slug, pageCount: p.pages ? p.pages.length : 1
     };
   });
   var allPosts = localPosts.slice();
@@ -145,6 +145,12 @@
       catBadge.className = 'cat-badge';
       catBadge.textContent = post.category || 'Other';
       meta.appendChild(catBadge);
+      if(post.pageCount > 1){
+        var pageBadge = document.createElement('span');
+        pageBadge.className = 'cat-badge';
+        pageBadge.textContent = post.pageCount + ' pages';
+        meta.appendChild(pageBadge);
+      }
       meta.appendChild(document.createTextNode((post.authorName || 'Anonymous') + ' · ' + (post.dateDisplay || formatDate(post.createdAt) || 'Just now')));
       card.appendChild(meta);
 

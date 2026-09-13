@@ -189,7 +189,7 @@ def update_categories(category, categories, dry_run):
 
 
 def update_sitemap(slug, date, dry_run):
-    loc = f"https://digiedge.github.io/post.html?slug={slug}"
+    loc = f"https://embedcraft.github.io/post.html?slug={slug}"
     if not SITEMAP.exists():
         return
     text = SITEMAP.read_text()

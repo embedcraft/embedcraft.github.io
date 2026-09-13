@@ -5,7 +5,7 @@
 </h1>
 
 > **Part 2 of the MIPI CSI-2 notes.** Continues from
-> [**CAMERA MIPI CSI-2 →**](post.html?slug=mipi-csi-2), picking up right after frame timings:
+> [**CAMERA MIPI CSI-2 →**](post.html?slug=camera-mipi-csi-2&page=1), picking up right after frame timings:
 > what colour formats a camera can emit, a single worked example carried through
 > RAW → RGB → YUV, and how per-frame metadata (embedded data) rides alongside the
 > pixels.
@@ -224,7 +224,7 @@ finer tonal steps than RAW8) and **colour representation** (one mosaiced compone
 three full components, or luma + subsampled chroma). Bandwidth follows directly from
 the two: `bytes/frame ≈ width × height × bpp / 8`; the per-format CSI-2
 packet-length rules (min pixels per packet, packet length in bytes) are in
-[**The calculations**](post.html?slug=mipi-csi-2) table on the MIPI CSI-2 page.
+[**The calculations**](post.html?slug=camera-mipi-csi-2&page=1) table on the MIPI CSI-2 page.
 
 ---
 
@@ -335,6 +335,6 @@ the 20-bit HDR data correctly.
 
 ---
 
-[◀ Previous: **CAMERA MIPI CSI-2**](post.html?slug=mipi-csi-2)
+[◀ Previous: **CAMERA MIPI CSI-2**](post.html?slug=camera-mipi-csi-2&page=1)
 &nbsp;·&nbsp;
-[Next: **Camera settings &amp; colour balancing** ▶](post.html?slug=color-balancing)
+[Next: **Camera settings &amp; colour balancing** ▶](post.html?slug=camera-mipi-csi-2&page=3)
