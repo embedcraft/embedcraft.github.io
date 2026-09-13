@@ -1,6 +1,6 @@
 # DigiEdge
 
-Company website. Live at https://digiedge.github.io
+Company website. Live at https://embedcraft.github.io
 
 Built as static HTML/CSS/JS, hosted on GitHub Pages — `index.html` is the
 homepage; `login.html`, `signup.html`, `dashboard.html` and `blog.html` add
@@ -184,3 +184,4 @@ the homepage contact section and footer, all pointing at the link in
 destination (e.g. swap the channel for a support number or group), edit
 that one line — the footer's `mailto`-style hardcoded copy in
 `index.html` should be updated to match if you do.
+
