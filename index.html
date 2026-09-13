@@ -116,6 +116,8 @@
   .icon-btn:hover{border-color:var(--ai);color:var(--ai);}
   .cart-badge{position:absolute;top:-6px;right:-6px;background:linear-gradient(135deg,var(--accent),var(--ai));color:#fff;font-size:.62rem;font-weight:800;line-height:1;min-width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 2px;}
   .cart-badge:empty,.cart-badge[data-count="0"]{display:none;}
+  #omToggle.playing{border-color:var(--ai);color:var(--ai);animation:om-beat 1.1s infinite;}
+  @keyframes om-beat{0%,100%{transform:scale(1);}5%{transform:scale(1.22);}19%{transform:scale(1.12);}30%{transform:scale(1);}}
   .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;}
   .burger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:.3s;}
   .burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
@@ -307,6 +309,7 @@
     </nav>
     <div style="display:flex;align-items:center;gap:10px;">
       <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+      <button class="icon-btn" id="omToggle" title="Play a mild ambient Om tone">🕉️</button>
       <a class="icon-btn" href="shop.html" title="Cart">🛒<span class="cart-badge"></span></a>
       <a class="nav-cta" data-go="contact">Book a consult</a>
       <div class="burger" id="burger"><span></span><span></span><span></span></div>
@@ -554,6 +557,8 @@
 <script src="js/products.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/whatsapp.js"></script>
+<script src="js/heartbeat.js"></script>
+<script src="js/om-drone.js"></script>
 <script>
 (function(){
   "use strict";
@@ -596,6 +601,16 @@
   var burger=document.getElementById('burger'), mmenu=document.getElementById('mmenu');
   burger.addEventListener('click', function(){ burger.classList.toggle('open'); mmenu.classList.toggle('open'); });
 
+  var omToggle = document.getElementById('omToggle');
+  if(omToggle && window.OmDrone){
+    omToggle.addEventListener('click', function(){
+      window.OmDrone.toggle();
+      var on = window.OmDrone.isPlaying();
+      omToggle.classList.toggle('playing', on);
+      omToggle.title = on ? 'Mute the ambient Om tone' : 'Play a mild ambient Om tone';
+    });
+  }
+
   /* ---------- 3. REVEAL ---------- */
   var io=new IntersectionObserver(function(en){
     en.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
@@ -616,26 +631,29 @@
     var r=cv.getBoundingClientRect(); mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top;
   });
   cv.parentElement.addEventListener('mouseleave', function(){ mouse.x=mouse.y=-9999; });
-  function draw(){
+  function draw(ts){
     ctx.clearRect(0,0,cv.width,cv.height);
+    var pulse = window.heartbeatPulse(ts || 0);
+    var rScale = 1 + pulse * 0.5;
+    var aScale = 0.7 + pulse * 0.3;
     for(var i=0;i<pts.length;i++){
       var p=pts[i]; p.x+=p.vx; p.y+=p.vy;
       if(p.x<0||p.x>cv.width) p.vx*=-1;
       if(p.y<0||p.y>cv.height) p.vy*=-1;
       var dm=Math.hypot(p.x-mouse.x,p.y-mouse.y);
-      ctx.beginPath(); ctx.arc(p.x,p.y, dm<120?2.6:1.8, 0, Math.PI*2);
-      ctx.fillStyle = dm<120 ? 'rgba(124,58,237,.75)' : 'rgba(47,91,255,.42)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x,p.y, (dm<120?2.6:1.8)*rScale, 0, Math.PI*2);
+      ctx.fillStyle = dm<120 ? 'rgba(124,58,237,'+(0.75*aScale)+')' : 'rgba(47,91,255,'+(0.42*aScale)+')'; ctx.fill();
       for(var j=i+1;j<pts.length;j++){
         var q=pts[j], d=Math.hypot(p.x-q.x,p.y-q.y);
         if(d<118){ ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y);
-          ctx.strokeStyle='rgba(47,91,255,'+(0.16*(1-d/118))+')'; ctx.lineWidth=1; ctx.stroke(); }
+          ctx.strokeStyle='rgba(47,91,255,'+(0.16*(1-d/118)*aScale)+')'; ctx.lineWidth=1; ctx.stroke(); }
       }
       if(dm<150){ ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(mouse.x,mouse.y);
         ctx.strokeStyle='rgba(124,58,237,'+(0.28*(1-dm/150))+')'; ctx.lineWidth=1; ctx.stroke(); }
     }
     requestAnimationFrame(draw);
   }
-  sizeCanvas(); draw(); window.addEventListener('resize', sizeCanvas);
+  sizeCanvas(); requestAnimationFrame(draw); window.addEventListener('resize', sizeCanvas);
 
   /* ---------- 5. TYPEWRITER (featured project code sample) ---------- */
   var codeLines=['// vibration_node.c — ESP32 sensor node','i2c_read(ACCEL_ADDR, buf, 6);','vib_rms  = compute_rms(buf);','temp_c   = read_temp_sensor();','',
