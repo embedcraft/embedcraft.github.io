@@ -2,9 +2,13 @@
   A synthesized, mild ambient "Om" drone — not a vocal recording (none was
   available/licensed), just a soft sustained tone built from a low
   fundamental plus a couple of quiet harmonics, gentle vibrato, and a slow
-  volume "breath" swell. Requires a user gesture to start (browser autoplay
-  policies block audio otherwise) — call OmDrone.start()/toggle() from a
-  click handler.
+  volume "breath" swell.
+
+  Plays by default, no toggle button — but browsers block audio until the
+  visitor has interacted with the page at least once, so call start() on
+  load (builds the graph, silently if the browser suspends it) and call
+  resume() from the very first click/key/touch/scroll anywhere on the page
+  to actually unlock sound. See the wiring in index.html.
 */
 (function(){
   "use strict";
@@ -66,6 +70,11 @@
     master.gain.linearRampToValueAtTime(BASE_GAIN, ctx.currentTime + FADE);
 
     nodes = { master: master, harmonics: harmonics, vibrato: vibrato, breath: breath };
+
+    // Most browsers create this suspended (silently) unless start() was
+    // itself called from a user gesture. This attempt is harmless either
+    // way; resume() below is what actually unlocks it on first interaction.
+    if(ctx.state === 'suspended') ctx.resume().catch(function(){});
   }
 
   function teardown(deadCtx, deadNodes){
@@ -94,9 +103,14 @@
     setTimeout(function(){ teardown(deadCtx, deadNodes); }, 1100);
   }
 
+  function resume(){
+    if(ctx && ctx.state === 'suspended') ctx.resume().catch(function(){});
+  }
+
   window.OmDrone = {
     start: start,
     stop: stop,
+    resume: resume,
     toggle: function(){ playing ? stop() : start(); },
     isPlaying: function(){ return playing; }
   };
