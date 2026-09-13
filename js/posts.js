@@ -6,7 +6,7 @@ import { initFirebase } from "./auth.js";
 
 const MAX_TITLE = 200;
 const MAX_CONTENT = 20000;
-export const POST_CATEGORIES = ["Firmware", "Edge AI", "Wireless", "Boards", "Tools", "Other"];
+export const POST_CATEGORIES = ["Firmware", "Edge AI", "Wireless", "Boards", "Sensors & Vision", "Tools", "Other"];
 
 export function validatePost(title, content){
   title = (title || '').trim();

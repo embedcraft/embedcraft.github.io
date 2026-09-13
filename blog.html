@@ -66,6 +66,7 @@
 <script src="js/products.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/whatsapp.js"></script>
+<script src="js/blog-posts.js"></script>
 <script type="module">
   import { onAuth } from './js/auth.js';
   import { listAllPosts, formatDate, POST_CATEGORIES } from './js/posts.js';
@@ -75,7 +76,14 @@
   var searchBox = document.getElementById('searchBox');
   var navWrite = document.getElementById('navWrite');
   var catPills = document.getElementById('catPills');
-  var allPosts = [];
+  var localPosts = window.LOCAL_POSTS.map(function(p){
+    return {
+      title: p.title, category: p.category, authorName: p.author,
+      content: p.summary, dateDisplay: new Date(p.date).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }),
+      isLocal: true, slug: p.slug
+    };
+  });
+  var allPosts = localPosts.slice();
   var activeCategory = 'All';
 
   catPills.innerHTML = ['All'].concat(POST_CATEGORIES).map(function(c){
@@ -89,10 +97,9 @@
     applyFilters();
   });
 
-  if(!window.FIREBASE_CONFIGURED){
-    document.getElementById('cfgAlert').classList.add('show');
-    postsList.innerHTML = '';
-  } else {
+  render(allPosts);
+
+  if(window.FIREBASE_CONFIGURED){
     onAuth(function(user){
       if(user){
         navWrite.textContent = 'Write a post';
@@ -100,6 +107,10 @@
       }
     });
     loadPosts();
+  } else {
+    document.getElementById('cfgAlert').textContent =
+      'The community blog isn’t connected to a database yet — the site owner needs to set up a Firebase project (see README.md). The guides below don’t need it and work today.';
+    document.getElementById('cfgAlert').classList.add('show');
   }
 
   function esc(s){
@@ -110,17 +121,17 @@
 
   function loadPosts(){
     listAllPosts().then(function(posts){
-      allPosts = posts;
-      render(allPosts);
+      allPosts = localPosts.concat(posts);
+      applyFilters();
     }).catch(function(err){
-      postsList.innerHTML = '<div class="empty-note">Couldn\'t load posts: ' + esc(err.message || err) + '</div>';
+      postsList.innerHTML = '<div class="empty-note">Couldn\'t load community posts: ' + esc(err.message || err) + '</div>';
     });
   }
 
   function render(posts){
     postCount.textContent = posts.length + (posts.length === 1 ? ' post' : ' posts');
     if(!posts.length){
-      postsList.innerHTML = '<div class="empty-note">No posts yet — <a href="signup.html">sign up</a> and be the first to write one.</div>';
+      postsList.innerHTML = '<div class="empty-note">No posts match that filter.</div>';
       return;
     }
     postsList.innerHTML = '';
@@ -134,7 +145,7 @@
       catBadge.className = 'cat-badge';
       catBadge.textContent = post.category || 'Other';
       meta.appendChild(catBadge);
-      meta.appendChild(document.createTextNode((post.authorName || 'Anonymous') + ' · ' + (formatDate(post.createdAt) || 'Just now')));
+      meta.appendChild(document.createTextNode((post.authorName || 'Anonymous') + ' · ' + (post.dateDisplay || formatDate(post.createdAt) || 'Just now')));
       card.appendChild(meta);
 
       var h3 = document.createElement('h3');
@@ -142,18 +153,26 @@
       card.appendChild(h3);
 
       var body = document.createElement('div');
-      body.className = 'pbody clamped';
+      body.className = post.isLocal ? 'pbody' : 'pbody clamped';
       body.textContent = post.content;
       card.appendChild(body);
 
-      var more = document.createElement('span');
-      more.className = 'pmore';
-      more.textContent = 'Read more';
-      more.addEventListener('click', function(){
-        var clamped = body.classList.toggle('clamped');
-        more.textContent = clamped ? 'Read more' : 'Show less';
-      });
-      card.appendChild(more);
+      if(post.isLocal){
+        var readLink = document.createElement('a');
+        readLink.className = 'pmore';
+        readLink.href = 'post.html?slug=' + encodeURIComponent(post.slug);
+        readLink.textContent = 'Read the full guide →';
+        card.appendChild(readLink);
+      } else {
+        var more = document.createElement('span');
+        more.className = 'pmore';
+        more.textContent = 'Read more';
+        more.addEventListener('click', function(){
+          var clamped = body.classList.toggle('clamped');
+          more.textContent = clamped ? 'Read more' : 'Show less';
+        });
+        card.appendChild(more);
+      }
 
       postsList.appendChild(card);
     });

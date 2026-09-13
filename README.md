@@ -127,6 +127,55 @@ to the Functions deploy, so the catalog exists in two files:
 add a product or change a price, update **both** — a mismatch means the
 shop displays one price but charges another.
 
+## Local blog posts (Markdown, no Firebase needed)
+
+Alongside the Firebase-backed community blog, `blog.html` also shows a set of
+file-based guides written by the team — these need no database and work even
+before Firebase is connected. They live in `blog-posts/<slug>/index.md`,
+listed in `js/blog-posts.js`, and are read full-length on `post.html?slug=<slug>`.
+
+**To add a new one:**
+
+1. Make a folder `blog-posts/<slug>/` with an `index.md` (plain Markdown —
+   GitHub-flavored: tables, fenced code, images all work) and an `images/`
+   subfolder for anything it references. Use relative paths like
+   `images/diagram.png` inside the post — `post.html` resolves them against
+   the post's own folder automatically. Add a `files/` subfolder the same way
+   for downloadable attachments (PDFs, source code).
+2. Add one entry to the `LOCAL_POSTS` array in `js/blog-posts.js` (slug,
+   title, category — reuse one of `POST_CATEGORIES` in `js/posts.js`, or add
+   a new one there — date, author, a one-sentence summary, and the path to
+   `index.md`).
+3. That's it — `blog.html`'s list, search and category filters, and the
+   homepage's blog preview, all read from that same manifest.
+
+**Or use `tools/add_blog.py`** to do all of the above from a source `.md`
+file (e.g. a post written in a separate working folder, TechBlogs-style):
+
+```
+python3 tools/add_blog.py \
+  --source /path/to/your/post.md \
+  --slug my-new-post \
+  --category Firmware \
+  --summary "One or two sentences for the blog card." \
+  [--title "..."] [--author "..."] [--date YYYY-MM-DD] \
+  [--images-dir /path/to/images] [--attach /path/to/file.c ...] \
+  [--keep-badges] [--force] [--dry-run]
+```
+
+It copies every image the post references into `blog-posts/<slug>/images/`
+and rewrites the paths, rewrites cross-links to other posts already in the
+manifest (`[...](other_post.md)` → `post.html?slug=other-post`), strips
+GitHub-repo badge clutter (follow/view-counter/commit badges) unless
+`--keep-badges` is passed, adds a new `POST_CATEGORIES` entry if the category
+is new, and writes (or updates, with `--force`) the entry in
+`js/blog-posts.js` plus a `sitemap.xml` entry. It does **not** auto-attach
+non-image files (PDFs, source code) it finds linked in the post — it warns
+about them instead, so you decide via `--attach` whether each one belongs on
+the site. **Always run with `--dry-run` first** to preview every change
+before anything is written, and check the diff afterward — title/summary
+extraction and cross-link guessing are heuristics, not guaranteed correct.
+
 ## WhatsApp button
 
 Every page shows a floating WhatsApp button (bottom-left) plus a link in
